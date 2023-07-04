@@ -1,0 +1,48 @@
+name: sqlc-restruct
+
+services:
+
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_PASSWORD: example
+    ports:
+      - "${SQLC_RESTRUCT_PORT:-5432}:5432"
+
+  migrator:
+    build:
+      context: .
+      dockerfile: docker/migrator/Dockerfile
+    environment:
+      PGHOST: db
+      PGPORT: 5432
+      PGDATABASE: postgres
+      PGUSER: postgres
+      PGPASSWORD: example
+    volumes:
+      - ./migrations:/go/migrations:cached
+    configs:
+      - source: migrator_config
+        target: /go/dbconfig.yml
+    depends_on:
+      - db
+    restart: on-failure
+
+  sqlc:
+    image: kjconroy/sqlc:1.18.0
+    volumes:
+      - .:/go:cached
+    working_dir: /go
+    configs:
+      - source: sqlc_config
+        target: /go/sqlc.yaml
+    depends_on:
+      - db
+    profiles:
+      - donotstart
+
+configs:
+  sqlc_config:
+    file: ./sqlc.yaml
+  migrator_config:
+    file: ./dbconfig.yml

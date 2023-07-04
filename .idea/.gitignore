@@ -1,0 +1,8 @@
+*
+!/.gitignore
+!/go-design-patterns.iml
+!/modules.xml
+!/meta.sql
+!/sqlDataSources.xml
+!/sqldialects.xml
+!/vcs.xml

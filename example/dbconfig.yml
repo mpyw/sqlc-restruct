@@ -1,0 +1,4 @@
+development:
+  dialect: postgres
+  datasource: host=${PGHOST} dbname=${PGDATABASE} user=${PGUSER} password=${PGPASSWORD} port=${PGPORT} sslmode=disable
+  dir: migrations

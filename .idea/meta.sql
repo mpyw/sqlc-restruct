@@ -1,0 +1,15 @@
+CREATE SCHEMA sqlc;
+
+CREATE OR REPLACE FUNCTION sqlc.arg(name text) RETURNS ANYELEMENT
+AS $$
+BEGIN
+    RETURN '';
+END
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION sqlc.narg(name text) RETURNS ANYELEMENT
+AS $$
+BEGIN
+    RETURN '';
+END
+$$ LANGUAGE plpgsql;

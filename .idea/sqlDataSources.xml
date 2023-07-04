@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DdlMappings">
+    <mapping uuid="go-design-patterns-ddl-mapping-migrations" name="Migrations DDL Mapping">
+      <data-sources dl="go-design-patterns-data-source-migrations" />
+      <scope>
+        <node kind="database" negative="1">
+          <node kind="schema" negative="1" />
+        </node>
+      </scope>
+    </mapping>
+    <mapping uuid="go-design-patterns-ddl-mapping-meta" name="Meta DDL Mapping">
+      <data-sources dl="go-design-patterns-data-source-meta" />
+      <scope>
+        <node kind="database" negative="1">
+          <node kind="schema" negative="1" />
+        </node>
+      </scope>
+    </mapping>
+  </component>
+  <component name="SqlDataSourceStorage">
+    <option name="dataSources">
+      <list>
+        <State>
+          <option name="id" value="go-design-patterns-data-source-migrations" />
+          <option name="name" value="Migrations Data Source" />
+          <option name="dbmsName" value="POSTGRES" />
+          <option name="urls">
+            <array>
+              <option value="file://$PROJECT_DIR$/app/database/migrations" />
+            </array>
+          </option>
+        </State>
+        <State>
+          <option name="id" value="go-design-patterns-data-source-meta" />
+          <option name="name" value="Meta Data Source" />
+          <option name="dbmsName" value="POSTGRES" />
+          <option name="urls">
+            <array>
+              <option value="file://$PROJECT_DIR$/.idea/meta.sql" />
+            </array>
+          </option>
+        </State>
+      </list>
+    </option>
+  </component>
+</project>

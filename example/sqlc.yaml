@@ -1,0 +1,16 @@
+version: 2
+sql:
+  - schema: migrations
+    queries:
+     - infra/db
+    engine: postgresql
+    gen:
+      go:
+        package: db
+        sql_package: pgx/v5
+        out: infra/db
+        emit_empty_slices: true
+        emit_interface: true
+        output_db_file_name: db.gen.go
+        output_models_file_name: models.gen.go
+        output_querier_file_name: querier.gen.go
