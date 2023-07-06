@@ -8,12 +8,18 @@ import (
 )
 
 type ActionInput struct {
-	// IfacePkgName The package name where the separated models and `Querier` will be located.
+	// IfacePkgName The package name where the separated Querier will be located.
 	IfacePkgName string
-	// IfacePkgURL The package URL where the separated models and `Querier` will be located (e.g. "github.com/<user>/<repo>/path/to/pkg").
+	// IfacePkgURL The package URL where the separated Querier will be located.
 	IfacePkgURL string
-	// IfaceDir The directory path where the separated models and `Querier` will be located.
+	// IfaceDir The directory path where the separated Querier will be located.
 	IfaceDir string
+	// ModelsPkgName The package name where the separated models will be located.
+	ModelsPkgName string
+	// ModelsPkgURL The package URL where the separated models will be located.
+	ModelsPkgURL string
+	// ModelsDir The directory path where the separated models will be located.
+	ModelsDir string
 	// ImplDir The original directory where the sqlc-generated code is located.
 	ImplDir string
 	// ImplSQLSuffix The suffix for sqlc-generated files from SQL files.

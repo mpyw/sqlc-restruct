@@ -5,6 +5,7 @@ go 1.20
 require (
 	github.com/jackc/pgx/v5 v5.4.1
 	github.com/urfave/cli/v2 v2.25.7
+	golang.org/x/exp v0.0.0-20230626212559-97b1e661b5df
 )
 
 require (

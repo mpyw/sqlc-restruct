@@ -13,11 +13,13 @@ import (
 	"strings"
 
 	"github.com/mpyw/sqlc-restruct/pkg/actions/separate-interface/internal/astutil"
+	"golang.org/x/exp/slices"
 )
 
 type runner struct {
-	input ActionInput
-	fset  *token.FileSet
+	input                   ActionInput
+	fset                    *token.FileSet
+	exportedSymbolsInModels []string
 }
 
 func (r *runner) Run() error {
@@ -25,6 +27,11 @@ func (r *runner) Run() error {
 	if err != nil {
 		return fmt.Errorf("runner.Run() failed: %w", err)
 	}
+	f, err := parser.ParseFile(r.fset, path.Join(r.input.ImplDir, r.input.ModelsFileName), nil, parser.ParseComments)
+	if err != nil {
+		return fmt.Errorf("runner.Run() failed: %w", err)
+	}
+	r.exportedSymbolsInModels = astutil.SymbolNameFromTypeOrValueDecls(astutil.ExportedIndividualTypeOrValueDecls(f.Decls...)...)
 
 	var newModelsContent []byte
 	var newQuerierContent []byte
@@ -58,8 +65,8 @@ func (r *runner) Run() error {
 	}
 
 	if newModelsContent != nil {
-		_ = os.Remove(path.Join(r.input.IfaceDir, r.input.ModelsFileName))
-		if err := os.WriteFile(path.Join(r.input.IfaceDir, r.input.ModelsFileName), newModelsContent, 0644); err != nil {
+		_ = os.Remove(path.Join(r.input.ModelsDir, r.input.ModelsFileName))
+		if err := os.WriteFile(path.Join(r.input.ModelsDir, r.input.ModelsFileName), newModelsContent, 0644); err != nil {
 			return fmt.Errorf("runner.Run() failed: %w", err)
 		}
 		_ = os.Remove(path.Join(r.input.ImplDir, r.input.ModelsFileName))
@@ -96,7 +103,7 @@ func (r *runner) newModelsContent() ([]byte, error) {
 	}
 
 	// Change package name of "models" file
-	f.Name = ast.NewIdent(r.input.IfacePkgName)
+	f.Name = ast.NewIdent(r.input.ModelsPkgName)
 
 	byt, err := r.intoBytes(f)
 	if err != nil {
@@ -114,6 +121,19 @@ func (r *runner) newQuerierContent() ([]byte, error) {
 	// Change package name of "querier" file
 	f.Name = ast.NewIdent(r.input.IfacePkgName)
 
+	// Prepend import statement of ModelsPkgURL
+	if r.input.ModelsPkgURL != r.input.IfacePkgURL {
+		f.Decls = append(append(([]ast.Decl)(nil), &ast.GenDecl{
+			Tok: token.IMPORT,
+			Specs: []ast.Spec{&ast.ImportSpec{
+				Path: &ast.BasicLit{
+					Kind:  token.STRING,
+					Value: fmt.Sprintf("%#v", r.input.ModelsPkgURL),
+				},
+			}},
+		}), f.Decls...)
+	}
+
 	// Remove top level constraint: var _ Querier = (*Querier)(nil)
 	for i, decl := range f.Decls {
 		if decl, ok := decl.(*ast.GenDecl); ok && decl.Tok == token.VAR {
@@ -124,6 +144,22 @@ func (r *runner) newQuerierContent() ([]byte, error) {
 				}
 			}
 		}
+	}
+
+	// Qualify exported references
+	if r.input.ModelsPkgURL != r.input.IfacePkgURL {
+		ast.Walk(
+			astutil.NewExportedExprIdentUpdater(func(ident *ast.Ident) ast.Expr {
+				if slices.Contains(r.exportedSymbolsInModels, ident.Name) {
+					return &ast.SelectorExpr{
+						X:   ast.NewIdent(r.input.ModelsPkgName),
+						Sel: ident,
+					}
+				}
+				return nil
+			}),
+			f,
+		)
 	}
 
 	dirEntries, err := os.ReadDir(r.input.ImplDir)
@@ -172,11 +208,28 @@ func (r *runner) newQueriesContent(filename string) ([]byte, error) {
 		}},
 	}), f.Decls...)
 
+	// Prepend import statement of ModelsPkgURL
+	if r.input.ModelsPkgURL != r.input.IfacePkgURL {
+		f.Decls = append(append(([]ast.Decl)(nil), &ast.GenDecl{
+			Tok: token.IMPORT,
+			Specs: []ast.Spec{&ast.ImportSpec{
+				Path: &ast.BasicLit{
+					Kind:  token.STRING,
+					Value: fmt.Sprintf("%#v", r.input.ModelsPkgURL),
+				},
+			}},
+		}), f.Decls...)
+	}
+
 	// Qualify exported references
 	ast.Walk(
 		astutil.NewExportedExprIdentUpdater(func(ident *ast.Ident) ast.Expr {
+			pkgName := r.input.IfacePkgName
+			if slices.Contains(r.exportedSymbolsInModels, ident.Name) {
+				pkgName = r.input.ModelsPkgName
+			}
 			return &ast.SelectorExpr{
-				X:   ast.NewIdent(r.input.IfacePkgName),
+				X:   ast.NewIdent(pkgName),
 				Sel: ident,
 			}
 		}),

@@ -51,6 +51,26 @@ func ExtractImportDecls(decls ...ast.Decl) []ast.Decl {
 	}}
 }
 
+func SymbolNameFromTypeOrValueDecls(decls ...ast.Decl) []string {
+	var symbols []string
+	for _, decl := range decls {
+		switch decl := decl.(type) {
+		case *ast.GenDecl:
+			for _, spec := range decl.Specs {
+				switch spec := spec.(type) {
+				case *ast.ValueSpec:
+					for _, name := range spec.Names {
+						symbols = append(symbols, name.Name)
+					}
+				case *ast.TypeSpec:
+					symbols = append(symbols, spec.Name.Name)
+				}
+			}
+		}
+	}
+	return symbols
+}
+
 func individualSpecs(exp bool, specs ...ast.Spec) []ast.Spec {
 	var exported []ast.Spec
 	for _, spec := range specs {
@@ -140,6 +160,19 @@ func (r *ExportedExprIdentUpdater) Visit(n ast.Node) ast.Visitor {
 				n.Rhs[i] = rh
 			}
 		}
+	case *ast.InterfaceType:
+		ast.Inspect(n, func(n ast.Node) bool {
+			switch n := n.(type) {
+			case *ast.Field:
+				if _, isInterfaceMethod := n.Type.(*ast.FuncType); !isInterfaceMethod {
+					if expr := r.resolveExpr(n.Type); expr != nil {
+						n.Type = expr
+					}
+					return false
+				}
+			}
+			return true
+		})
 	}
 	return r
 }

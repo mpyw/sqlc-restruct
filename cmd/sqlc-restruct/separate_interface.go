@@ -12,18 +12,30 @@ var SeparateInterfaceCommand = &cli.Command{
 	Flags: []cli.Flag{
 		&cli.StringFlag{
 			Name:     "iface-pkg-name",
-			Usage:    "The package name where the separated models and Querier will be located.",
+			Usage:    "The package name where the separated Querier will be located.",
 			Required: true,
 		},
 		&cli.StringFlag{
 			Name:     "iface-pkg-url",
-			Usage:    "The package URL where the separated models and Querier will be located (e.g. \"github.com/<user>/<repo>/path/to/pkg\").",
+			Usage:    "The package URL where the separated Querier will be located. (e.g. \"github.com/<user>/<repo>/path/to/pkg\")",
 			Required: true,
 		},
 		&cli.StringFlag{
 			Name:     "iface-dir",
-			Usage:    "The directory path where the separated models and Querier will be located.",
+			Usage:    "The directory path where the separated Querier will be located.",
 			Required: true,
+		},
+		&cli.StringFlag{
+			Name:  "models-pkg-name",
+			Usage: "The package name where the separated models will be located. (default: --models-pkg-name value)",
+		},
+		&cli.StringFlag{
+			Name:  "models-pkg-url",
+			Usage: "The package URL where the separated models will be located. (default: --models-pkg-url value)",
+		},
+		&cli.StringFlag{
+			Name:  "models-dir",
+			Usage: "The directory path where the separated models will be located. (default: --iface-dir value)",
 		},
 		&cli.StringFlag{
 			Name:  "impl-dir",
@@ -47,10 +59,30 @@ var SeparateInterfaceCommand = &cli.Command{
 		},
 	},
 	Action: func(c *cli.Context) error {
+		iPkgName := c.String("iface-pkg-name")
+		iPkgURL := c.String("iface-pkg-url")
+		iDir := c.String("iface-dir")
+
+		mPkgName := c.String("models-pkg-name")
+		if mPkgName == "" {
+			mPkgName = iPkgName
+		}
+		mPkgURL := c.String("models-pkg-url")
+		if mPkgURL == "" {
+			mPkgURL = iPkgURL
+		}
+		mDir := c.String("models-dir")
+		if mDir == "" {
+			mDir = iDir
+		}
+
 		return separateinterface.Action(c.Context, separateinterface.ActionInput{
-			IfacePkgName:    c.String("iface-pkg-name"),
-			IfacePkgURL:     c.String("iface-pkg-url"),
-			IfaceDir:        c.String("iface-dir"),
+			IfacePkgName:    iPkgName,
+			IfacePkgURL:     iPkgURL,
+			IfaceDir:        iDir,
+			ModelsPkgName:   mPkgName,
+			ModelsPkgURL:    mPkgURL,
+			ModelsDir:       mDir,
 			ImplDir:         c.String("impl-dir"),
 			ImplSQLSuffix:   c.String("impl-sql-suffix"),
 			ModelsFileName:  c.String("models-file-name"),
