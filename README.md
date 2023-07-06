@@ -31,7 +31,7 @@ go install github.com/mpyw/sqlc-restruct@v0.0.0-alpha.0
 ### [separate-interface](./cmd/separate_interface.go)
 
 ```ShellSession
-user@host:~$ sqlc-restruct --help
+user@host:~$ sqlc-restruct separate-interface --help
 NAME:
    sqlc-restruct separate-interface - Separates models and the `Querier` interface from the `Queries` struct. This is typically done to adhere to the Dependency Inversion Principle (DIP), allowing for more flexible and testable code.
 
