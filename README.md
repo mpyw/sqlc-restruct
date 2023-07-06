@@ -52,6 +52,6 @@ OPTIONS:
 We recommend chaining the `//go:generate` directive for `sqlc-restruct` right after the one for `sqlc` in your code.
 
 ```go
-//go:generate sqlc-generate
+//go:generate sqlc generate
 //go:generate sqlc-restruct separate-interface --models-file-name=models.gen.go --querier-file-name=querier.gen.go --iface-dir=domain/repos --iface-pkg-name=repos --iface-pkg-url=github.com/example/domain/repos
 ```
