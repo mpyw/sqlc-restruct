@@ -123,17 +123,39 @@ func individualTypeOrValueDecls(exp bool, decls ...ast.Decl) []ast.Decl {
 }
 
 func NewExportedExprIdentUpdater(updater func(*ast.Ident) ast.Expr) *ExportedExprIdentUpdater {
-	return &ExportedExprIdentUpdater{updater: updater}
+	return &ExportedExprIdentUpdater{identUpdater: updater}
+}
+
+func NewExportedSelectorExprUpdater(updater func(expr *ast.SelectorExpr) ast.Expr) *ExportedExprIdentUpdater {
+	return &ExportedExprIdentUpdater{selectorExprUpdater: updater}
 }
 
 type ExportedExprIdentUpdater struct {
-	updater func(*ast.Ident) ast.Expr
+	identUpdater        func(*ast.Ident) ast.Expr
+	selectorExprUpdater func(expr *ast.SelectorExpr) ast.Expr
 }
 
 func (r *ExportedExprIdentUpdater) Visit(n ast.Node) ast.Visitor {
 	switch n := n.(type) {
 	case *ast.FuncDecl:
-		r.walkFuncDecl(n)
+		// Explicitly exclude method receiver
+		ast.Walk(r, n.Type.Params)
+		ast.Walk(r, n.Type.Results)
+		ast.Walk(r, n.Body)
+		return nil
+	case *ast.InterfaceType:
+		ast.Inspect(n, func(n ast.Node) bool {
+			switch n := n.(type) {
+			case *ast.Field:
+				if _, isInterfaceMethod := n.Type.(*ast.FuncType); !isInterfaceMethod {
+					if expr := r.resolveExpr(n.Type); expr != nil {
+						n.Type = expr
+					}
+					return false
+				}
+			}
+			return true
+		})
 		return nil
 	case *ast.Field:
 		if expr := r.resolveExpr(n.Type); expr != nil {
@@ -160,28 +182,8 @@ func (r *ExportedExprIdentUpdater) Visit(n ast.Node) ast.Visitor {
 				n.Rhs[i] = rh
 			}
 		}
-	case *ast.InterfaceType:
-		ast.Inspect(n, func(n ast.Node) bool {
-			switch n := n.(type) {
-			case *ast.Field:
-				if _, isInterfaceMethod := n.Type.(*ast.FuncType); !isInterfaceMethod {
-					if expr := r.resolveExpr(n.Type); expr != nil {
-						n.Type = expr
-					}
-					return false
-				}
-			}
-			return true
-		})
 	}
 	return r
-}
-
-func (r *ExportedExprIdentUpdater) walkFuncDecl(n *ast.FuncDecl) {
-	// Explicitly exclude method receiver
-	ast.Walk(r, n.Type.Params)
-	ast.Walk(r, n.Type.Results)
-	ast.Walk(r, n.Body)
 }
 
 func (r *ExportedExprIdentUpdater) resolveExpr(n ast.Expr) ast.Expr {
@@ -206,9 +208,13 @@ func (r *ExportedExprIdentUpdater) resolveExpr(n ast.Expr) ast.Expr {
 		if expr := r.resolveExpr(n.Type); expr != nil {
 			n.Type = expr
 		}
+	case *ast.SelectorExpr:
+		if r.selectorExprUpdater != nil {
+			return r.selectorExprUpdater(n)
+		}
 	case *ast.Ident:
-		if HasCapitalName(n) {
-			return r.updater(n)
+		if r.identUpdater != nil && HasCapitalName(n) {
+			return r.identUpdater(n)
 		}
 	}
 	return n

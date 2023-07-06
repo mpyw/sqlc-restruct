@@ -1,6 +1,3 @@
 *
 !/.gitignore
-!/db.go
 !/query.*.sql
-!/articles/
-!/users/
