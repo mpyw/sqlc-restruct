@@ -12,5 +12,5 @@ sql:
         emit_empty_slices: true
         emit_interface: true
         output_db_file_name: db.gen.go
-        output_models_file_name: models.gen.go
+        output_models_file_name: entities.gen.go
         output_querier_file_name: querier.gen.go
