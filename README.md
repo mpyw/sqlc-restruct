@@ -39,14 +39,14 @@ USAGE:
    sqlc-restruct separate-interface [command options] [arguments...]
 
 OPTIONS:
-   --iface-pkg-name Querier     The package name where the separated models and Querier will be located.
-   --iface-pkg-url Querier      The package URL where the separated models and Querier will be located (e.g. "github.com/<user>/<repo>/path/to/pkg").
-   --iface-dir Querier          The directory path where the separated models and Querier will be located.
-   --impl-dir value             The original directory where the sqlc-generated code is located. (default: ".")
-   --impl-sql-suffix value      The suffix for sqlc-generated files from SQL files. (default: ".sql.go")
-   --models-file-name value     The file name for the sqlc-generated models file. (default: "models.go")
-   --querier-file-name Querier  The file name for the sqlc-generated Querier file. (default: "querier.go")
-   --help, -h                   show help
+   --iface-pkg-name value     The package name where the separated models and Querier will be located.
+   --iface-pkg-url value      The package URL where the separated models and Querier will be located (e.g. "github.com/<user>/<repo>/path/to/pkg").
+   --iface-dir value          The directory path where the separated models and Querier will be located.
+   --impl-dir value           The original directory where the sqlc-generated code is located. (default: ".")
+   --impl-sql-suffix value    The suffix for sqlc-generated files from SQL files. (default: ".sql.go")
+   --models-file-name value   The file name for the sqlc-generated models file. (default: "models.go")
+   --querier-file-name value  The file name for the sqlc-generated Querier file. (default: "querier.go")
+   --help, -h                 show help
 ```
 
 We recommend chaining the `//go:generate` directive for `sqlc-restruct` right after the one for `sqlc` in your code.
