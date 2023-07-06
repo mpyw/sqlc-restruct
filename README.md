@@ -23,7 +23,7 @@ GLOBAL OPTIONS:
 ## Installation
 
 ```
-go install github.com/mpyw/sqlc-restruct@v0.0.0-alpha.0
+go install github.com/mpyw/sqlc-restruct/cmd@v0.0.0-alpha.0
 ```
 
 ## SubCommands
