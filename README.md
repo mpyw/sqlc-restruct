@@ -2,7 +2,7 @@
 
 Post-processor for [kyleconroy/sqlc](https://github.com/kyleconroy/sqlc)
 
-<img width="1048" alt="overview" src="https://github.com/mpyw/sqlc-restruct/assets/1351893/4aa8cc38-538f-442e-ba70-990226e9623f">
+<img width="1048" alt="overview" src="https://github.com/mpyw/sqlc-restruct/assets/1351893/51b422a3-fb7d-4808-a100-ff7c039546b8">
 
 ```ShellSession
 user@host:~$ sqlc-restruct --help
