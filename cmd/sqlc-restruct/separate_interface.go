@@ -42,7 +42,7 @@ var SeparateInterfaceCommand = &cli.Command{
 		},
 		&cli.StringFlag{
 			Name:  "querier-file-name",
-			Usage: "The file name for the sqlc-generated `Querier` file.",
+			Usage: "The file name for the sqlc-generated Querier file.",
 			Value: "querier.go",
 		},
 	},
