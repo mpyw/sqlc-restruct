@@ -12,17 +12,17 @@ var SeparateInterfaceCommand = &cli.Command{
 	Flags: []cli.Flag{
 		&cli.StringFlag{
 			Name:     "iface-pkg-name",
-			Usage:    "The package name where the separated models and `Querier` will be located.",
+			Usage:    "The package name where the separated models and Querier will be located.",
 			Required: true,
 		},
 		&cli.StringFlag{
 			Name:     "iface-pkg-url",
-			Usage:    "The package URL where the separated models and `Querier` will be located (e.g. \"github.com/<user>/<repo>/path/to/pkg\").",
+			Usage:    "The package URL where the separated models and Querier will be located (e.g. \"github.com/<user>/<repo>/path/to/pkg\").",
 			Required: true,
 		},
 		&cli.StringFlag{
 			Name:     "iface-dir",
-			Usage:    "The directory path where the separated models and `Querier` will be located.",
+			Usage:    "The directory path where the separated models and Querier will be located.",
 			Required: true,
 		},
 		&cli.StringFlag{
