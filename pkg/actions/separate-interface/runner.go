@@ -12,7 +12,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/mpyw/sqlc-restruct/pkg/actions/separate-interface/internal/astutil"
+	"github.com/mpyw/sqlc-restruct/pkg/internal/astutil"
 	"golang.org/x/exp/slices"
 )
 

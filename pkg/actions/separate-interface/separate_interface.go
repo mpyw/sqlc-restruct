@@ -26,7 +26,7 @@ type ActionInput struct {
 	ImplSQLSuffix string
 	// ModelsFileName The file name for the sqlc-generated models file.
 	ModelsFileName string
-	// QuerierFileName The file name for the sqlc-generated `Querier` file.
+	// QuerierFileName The file name for the sqlc-generated Querier file.
 	QuerierFileName string
 }
 
