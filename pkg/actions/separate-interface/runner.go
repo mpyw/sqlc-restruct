@@ -12,8 +12,10 @@ import (
 	"path"
 	"strings"
 
-	"github.com/mpyw/sqlc-restruct/pkg/internal/astutil"
 	"golang.org/x/exp/slices"
+	"golang.org/x/tools/imports"
+
+	"github.com/mpyw/sqlc-restruct/pkg/internal/astutil"
 )
 
 type runner struct {
@@ -43,19 +45,32 @@ func (r *runner) Run() error {
 			if newModelsContent, err = r.newModelsContent(); err != nil {
 				return err
 			}
+			newModelsContent, err = imports.Process("", newModelsContent, nil)
+			if err != nil {
+				return err
+			}
 			continue
 		}
 		if filename == r.input.QuerierFileName {
 			if newQuerierContent, err = r.newQuerierContent(); err != nil {
 				return err
 			}
+			newQuerierContent, err = imports.Process("", newQuerierContent, nil)
+			if err != nil {
+				return err
+			}
 			continue
 		}
-		if strings.HasSuffix(filename, r.input.ImplSQLSuffix) {
+		if r.isImplFile(filename) {
 			var newQueriesContent []byte
 			if newQueriesContent, err = r.newQueriesContent(filename); err != nil {
 				return err
 			}
+			newQueriesContent, err = imports.Process("", newQueriesContent, nil)
+			if err != nil {
+				return err
+			}
+
 			if newQueriesContents == nil {
 				newQueriesContents = make(map[string][]byte)
 			}
@@ -66,21 +81,21 @@ func (r *runner) Run() error {
 
 	if newModelsContent != nil {
 		_ = os.Remove(path.Join(r.input.ModelsDir, r.input.ModelsFileName))
-		if err := os.WriteFile(path.Join(r.input.ModelsDir, r.input.ModelsFileName), newModelsContent, 0644); err != nil {
+		if err := os.WriteFile(path.Join(r.input.ModelsDir, r.input.ModelsFileName), newModelsContent, 0o644); err != nil {
 			return fmt.Errorf("runner.Run() failed: %w", err)
 		}
 		_ = os.Remove(path.Join(r.input.ImplDir, r.input.ModelsFileName))
 	}
 	if newQuerierContent != nil {
 		_ = os.Remove(path.Join(r.input.IfaceDir, r.input.QuerierFileName))
-		if err := os.WriteFile(path.Join(r.input.IfaceDir, r.input.QuerierFileName), newQuerierContent, 0644); err != nil {
+		if err := os.WriteFile(path.Join(r.input.IfaceDir, r.input.QuerierFileName), newQuerierContent, 0o644); err != nil {
 			return fmt.Errorf("runner.Run() failed: %w", err)
 		}
 		_ = os.Remove(path.Join(r.input.ImplDir, r.input.QuerierFileName))
 	}
 	for filename, content := range newQueriesContents {
 		_ = os.Remove(path.Join(r.input.ImplDir, filename))
-		if err := os.WriteFile(path.Join(r.input.ImplDir, filename), content, 0644); err != nil {
+		if err := os.WriteFile(path.Join(r.input.ImplDir, filename), content, 0o644); err != nil {
 			return fmt.Errorf("runner.Run() failed: %w", err)
 		}
 	}
@@ -168,7 +183,7 @@ func (r *runner) newQuerierContent() ([]byte, error) {
 	}
 
 	for _, dirEntry := range dirEntries {
-		if !strings.HasSuffix(dirEntry.Name(), r.input.ImplSQLSuffix) {
+		if !r.isImplFile(dirEntry.Name()) {
 			continue
 		}
 
@@ -272,4 +287,17 @@ func (r *runner) newQueriesContent(filename string) ([]byte, error) {
 		return nil, fmt.Errorf("runner.newQueriesContent() failed: %w", err)
 	}
 	return byt, nil
+}
+
+func (r *runner) isImplFile(filename string) bool {
+	return strings.HasSuffix(filename, r.input.ImplSQLSuffix) || inStrings(filename, r.input.AditionalQuerierFiles)
+}
+
+func inStrings(s string, slice []string) bool {
+	for _, v := range slice {
+		if v == s {
+			return true
+		}
+	}
+	return false
 }

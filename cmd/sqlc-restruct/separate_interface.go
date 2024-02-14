@@ -57,6 +57,11 @@ var SeparateInterfaceCommand = &cli.Command{
 			Usage: "The file name for the sqlc-generated Querier file.",
 			Value: "querier.go",
 		},
+		&cli.StringSliceFlag{
+			Name:  "aditional-querier-files",
+			Usage: "A list of other files that contains querier impl. (e.g. copyfrom.go)",
+			Value: cli.NewStringSlice("copyfrom.go"),
+		},
 	},
 	Action: func(c *cli.Context) error {
 		iPkgName := c.String("iface-pkg-name")
@@ -77,16 +82,17 @@ var SeparateInterfaceCommand = &cli.Command{
 		}
 
 		return separateinterface.Action(c.Context, separateinterface.ActionInput{
-			IfacePkgName:    iPkgName,
-			IfacePkgURL:     iPkgURL,
-			IfaceDir:        iDir,
-			ModelsPkgName:   mPkgName,
-			ModelsPkgURL:    mPkgURL,
-			ModelsDir:       mDir,
-			ImplDir:         c.String("impl-dir"),
-			ImplSQLSuffix:   c.String("impl-sql-suffix"),
-			ModelsFileName:  c.String("models-file-name"),
-			QuerierFileName: c.String("querier-file-name"),
+			IfacePkgName:          iPkgName,
+			IfacePkgURL:           iPkgURL,
+			IfaceDir:              iDir,
+			ModelsPkgName:         mPkgName,
+			ModelsPkgURL:          mPkgURL,
+			ModelsDir:             mDir,
+			ImplDir:               c.String("impl-dir"),
+			ImplSQLSuffix:         c.String("impl-sql-suffix"),
+			ModelsFileName:        c.String("models-file-name"),
+			QuerierFileName:       c.String("querier-file-name"),
+			AditionalQuerierFiles: c.StringSlice("aditional-querier-files"),
 		})
 	},
 }
