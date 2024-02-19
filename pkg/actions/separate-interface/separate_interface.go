@@ -28,6 +28,8 @@ type ActionInput struct {
 	ModelsFileName string
 	// QuerierFileName The file name for the sqlc-generated Querier file.
 	QuerierFileName string
+	// AditionalQuerierFiles A list of other files that contains querier impl.
+	AditionalQuerierFiles []string
 }
 
 func Action(_ context.Context, input ActionInput) error {

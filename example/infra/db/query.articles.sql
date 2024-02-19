@@ -17,3 +17,6 @@ SELECT * FROM articles WHERE user_id = $1 ORDER BY created_at DESC;
 
 -- name: ArticleListOfUserInCategory :many
 SELECT * FROM articles WHERE user_id = $1 AND category_id = $2 ORDER BY created_at DESC;
+
+-- name: ArticleInsertCopyFrom :copyfrom
+INSERT INTO articles(user_id, category_id, slug, title, body) VALUES ($1, $2, $3, $4, $5);
