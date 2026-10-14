@@ -5,7 +5,7 @@ go 1.26.0
 require (
 	github.com/urfave/cli/v2 v2.27.7
 	golang.org/x/exp v0.0.0-20230626212559-97b1e661b5df
-	golang.org/x/tools v0.50.0
+	golang.org/x/tools v0.51.0
 )
 
 require (
