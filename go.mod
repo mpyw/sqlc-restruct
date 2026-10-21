@@ -1,6 +1,6 @@
 module github.com/mpyw/sqlc-restruct
 
-go 1.26.0
+go 1.27.3
 
 require (
 	github.com/urfave/cli/v2 v2.27.7
